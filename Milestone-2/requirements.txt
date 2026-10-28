@@ -1,0 +1,10 @@
+
+Flask
+Flask-SQLAlchemy
+Werkzeug
+python-dotenv
+numpy
+pandas
+scikit-learn
+matplotlib
+google-generativeai
