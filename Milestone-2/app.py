@@ -284,7 +284,6 @@ INTERNAL_TEMPLATES = {
     'admin/dashboard.html': r"""{% extends 'base.html' %}{% block content %}<div class="container py-4"><h1>Admin dashboard</h1><div class="card p-4"><p>Total registered users: <b>{{ user_count }}</b></p><a class="btn btn-primary" href="{{ url_for('admin_users') }}">Manage users</a></div></div>{% endblock %}""",
     'admin/users.html': r"""{% extends 'base.html' %}{% block content %}<div class="container py-4"><h1>Manage users</h1><div class="card p-3 table-responsive"><table class="table"><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Admin</th><th>Joined</th></tr></thead><tbody>{% for u in users %}<tr><td>{{ u.id }}</td><td>{{ u.username|e }}</td><td>{{ u.email|e }}</td><td>{{ 'Yes' if u.is_admin else 'No' }}</td><td>{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '' }}</td></tr>{% endfor %}</tbody></table></div></div>{% endblock %}""",
     'user/simulation.html': r"""{% extends 'base.html' %}{% block content %}<div class="container py-4"><h1>Future Simulation</h1><p>Explore a simple estimate of how a choice may affect your future. Estimates are illustrative, not financial advice.</p><div class="card p-3 my-3"><form method="post" class="row g-3"><div class="col-md-5"><label class="form-label">Scenario</label><select class="form-select" name="scenario"><option value="save">Save monthly</option><option value="invest">Invest monthly</option><option value="spend">Spend extra monthly</option><option value="study_more">Study more hours weekly</option><option value="exercise">Exercise minutes daily</option></select></div><div class="col-md-5"><label class="form-label">Amount (₹ for money scenarios; units for time scenarios)</label><input class="form-control" type="number" name="amount" min="1" step="any" required></div><div class="col-md-2 d-flex align-items-end"><button class="btn btn-primary">Simulate</button></div></form></div>{% if result %}<div class="card p-4"><h3>{{ result.desc|e }}</h3><p>{{ result.impact|e }}</p><p>Risk: <b>{{ result.risk|e }}</b></p><p>{{ result.rec|e }}</p></div>{% endif %}<div class="card p-3 mt-3"><h4>Previous simulations</h4><ul>{% for item in history %}<li>{{ item.timestamp.strftime('%Y-%m-%d %H:%M') }} — {{ item.result_desc|e }}: {{ item.result_impact|e }}</li>{% else %}<li>No simulations yet.</li>{% endfor %}</ul></div></div>{% endblock %}""",
-    'user/assistant.html': r"""{% extends 'base.html' %}{% block content %}<div class="container py-4" style="max-width:900px"><h1>AI Assistant</h1><p>Ask for general suggestions about finance, studying, fitness, or habits. Responses are informational.</p><div class="card p-3 mb-3"><form method="post"><label class="form-label">Your question</label><textarea class="form-control mb-3" name="question" rows="3" required maxlength="2000">{{ question or '' }}</textarea><button class="btn btn-primary">Ask assistant</button></form></div>{% if answer %}<div class="card p-3 mb-3"><h5>Response</h5><p style="white-space:pre-wrap">{{ answer|e }}</p></div>{% endif %}<div class="card p-3"><h5>Recent conversation</h5>{% for msg in messages %}<div class="border-bottom py-2"><b>You:</b> {{ msg.question|e }}<br><b>Assistant:</b> {{ msg.response|e }}</div>{% else %}<p>No messages yet.</p>{% endfor %}</div></div>{% endblock %}""",
     'settings.html': r"""{% extends 'base.html' %}{% block content %}<div class="container py-4" style="max-width:700px"><h1>Account settings</h1><div class="card p-4"><form method="post"><label class="form-label">Username</label><input class="form-control mb-3" name="username" value="{{ current_user.username|e }}" required maxlength="80"><label class="form-label">Email</label><input class="form-control mb-3" type="email" name="email" value="{{ current_user.email|e }}" required maxlength="120"><label class="form-label">Age</label><input class="form-control mb-3" type="number" name="age" min="13" max="120" value="{{ current_user.age }}"><label class="form-label">Occupation</label><input class="form-control mb-3" name="occupation" value="{{ current_user.occupation|e }}" maxlength="100"><button class="btn btn-primary">Save settings</button></form></div></div>{% endblock %}""",
 }
 app.jinja_loader = ChoiceLoader([DictLoader(INTERNAL_TEMPLATES), app.jinja_loader])
@@ -1013,13 +1012,16 @@ def user_simulation():
     history_items = SimulationHistory.query.filter_by(user_id=current_user.id).order_by(SimulationHistory.timestamp.desc()).limit(10).all()
     return render_template('user/simulation.html', result=result, history=history_items)
 
+
 @app.route('/user/assistant', methods=['GET', 'POST'])
 @login_required
 def user_assistant():
     question = ''
     answer = ''
+
     if request.method == 'POST':
         question = request.form.get('question', '').strip()
+
         if not question:
             flash('Please enter a question.', 'warning')
         elif len(question) > 2000:
@@ -1031,8 +1033,10 @@ def user_assistant():
                     answer = (getattr(response, 'text', '') or '').strip()
                 except Exception:
                     answer = ''
+
             if not answer:
                 lower = question.lower()
+
                 if any(w in lower for w in ('study', 'exam', 'learn', 'gpa')):
                     answer = 'Try a focused 25–50 minute study block, define one measurable goal, remove distractions, and review what you learned at the end.'
                 elif any(w in lower for w in ('fitness', 'exercise', 'workout', 'health')):
@@ -1041,10 +1045,29 @@ def user_assistant():
                     answer = 'Track income and expenses, separate needs from wants, set a small regular savings target, and review your budget weekly. This is general information, not financial advice.'
                 else:
                     answer = 'Break the problem into a small next action, decide how you will measure progress, and review the result. Add a GEMINI_API_KEY to enable AI-generated responses.'
-            db.session.add(ChatMessage(user_id=current_user.id, question=question, response=answer))
+
+            db.session.add(
+                ChatMessage(
+                    user_id=current_user.id,
+                    question=question,
+                    response=answer
+                )
+            )
             db.session.commit()
-    messages = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.timestamp.desc()).limit(10).all()
-    return render_template('user/assistant.html', question=question, answer=answer, messages=messages)
+
+    messages = ChatMessage.query.filter_by(
+        user_id=current_user.id
+    ).order_by(ChatMessage.timestamp.desc()).limit(10).all()
+
+    return render_template(
+        'user/assistant.html',
+        question=question,
+        answer=answer,
+        messages=messages,
+        all_messages=messages,
+        user=current_user
+    )
+
 
 @app.route('/settings', methods=['GET', 'POST'])
 @login_required
