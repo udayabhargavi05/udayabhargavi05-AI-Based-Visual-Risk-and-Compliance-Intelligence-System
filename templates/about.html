@@ -1,0 +1,560 @@
+
+{% extends "base.html" %}
+
+{% block title %}About Us | Visual Risk and AI Intelligence{% endblock %}
+
+{% block content %}
+
+<style>
+    :root {
+        --violet: #764ba2;
+        --blue: #667eea;
+        --lavender: #f3efff;
+        --dark: #2d3748;
+        --muted: #718096;
+    }
+
+    .about-page {
+        background: linear-gradient(180deg, #f8f7ff 0%, #ffffff 100%);
+        padding-bottom: 70px;
+        overflow: hidden;
+    }
+
+    /* HERO SECTION */
+    .about-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 85px 20px 95px;
+        color: white;
+        background: linear-gradient(
+            125deg,
+            #667eea 0%,
+            #6f65cc 45%,
+            #764ba2 100%
+        );
+        border-radius: 0 0 45px 45px;
+    }
+
+    .about-hero::before,
+    .about-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .about-hero::before {
+        width: 340px;
+        height: 340px;
+        right: -100px;
+        top: -140px;
+        background: rgba(255,255,255,0.09);
+    }
+
+    .about-hero::after {
+        width: 250px;
+        height: 250px;
+        left: -100px;
+        bottom: -150px;
+        background: rgba(255,255,255,0.08);
+    }
+
+    .about-hero-content {
+        position: relative;
+        z-index: 1;
+        max-width: 900px;
+        margin: auto;
+        text-align: center;
+    }
+
+    .about-pill {
+        display: inline-block;
+        padding: 9px 18px;
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 50px;
+        background: rgba(255,255,255,0.15);
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 24px;
+    }
+
+    .about-hero h1 {
+        font-size: clamp(2.3rem, 5vw, 4rem);
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 22px;
+        letter-spacing: -1px;
+    }
+
+    .about-hero h1 span {
+        color: #e8ddff;
+    }
+
+    .about-hero p {
+        max-width: 760px;
+        margin: auto;
+        font-size: 1.15rem;
+        line-height: 1.9;
+        color: rgba(255,255,255,0.92);
+    }
+
+    .about-hero-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 32px;
+    }
+
+    .about-btn-primary,
+    .about-btn-outline {
+        display: inline-block;
+        text-decoration: none;
+        padding: 13px 27px;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: all 0.25s ease;
+    }
+
+    .about-btn-primary {
+        background: white;
+        color: #6c5bc7;
+        box-shadow: 0 8px 22px rgba(38,25,91,0.18);
+    }
+
+    .about-btn-primary:hover {
+        color: #764ba2;
+        transform: translateY(-3px);
+    }
+
+    .about-btn-outline {
+        color: white;
+        border: 1px solid rgba(255,255,255,0.65);
+        background: rgba(255,255,255,0.08);
+    }
+
+    .about-btn-outline:hover {
+        background: rgba(255,255,255,0.18);
+        color: white;
+        transform: translateY(-3px);
+    }
+
+    /* INTRODUCTION */
+    .about-intro {
+        padding: 75px 0 35px;
+    }
+
+    .about-eyebrow {
+        text-align: center;
+        color: #7655c7;
+        font-size: 0.85rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 13px;
+    }
+
+    .about-heading {
+        text-align: center;
+        color: var(--dark);
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        font-weight: 800;
+        letter-spacing: -0.7px;
+        margin-bottom: 18px;
+    }
+
+    .about-heading span {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .about-description {
+        max-width: 800px;
+        margin: 0 auto 45px;
+        text-align: center;
+        color: var(--muted);
+        line-height: 1.9;
+        font-size: 1.06rem;
+    }
+
+    /* FEATURE CARDS */
+    .about-card {
+        position: relative;
+        height: 100%;
+        padding: 30px;
+        background: white;
+        border: 1px solid #eee9fc;
+        border-radius: 24px;
+        box-shadow: 0 8px 28px rgba(74,55,125,0.055);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .about-card:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 18px 38px rgba(102,81,180,0.15);
+    }
+
+    .about-icon {
+        width: 66px;
+        height: 66px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        color: white;
+        font-size: 1.65rem;
+        margin-bottom: 23px;
+        box-shadow: 0 8px 18px rgba(102,81,180,0.17);
+    }
+
+    .icon-purple {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .icon-pink {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+
+    .icon-blue {
+        background: linear-gradient(135deg, #4facfe, #00c6ff);
+    }
+
+    .icon-green {
+        background: linear-gradient(135deg, #43e97b, #38a99a);
+    }
+
+    .icon-violet {
+        background: linear-gradient(135deg, #a18cd1, #764ba2);
+    }
+
+    .about-card h4 {
+        color: var(--dark);
+        font-weight: 750;
+        font-size: 1.2rem;
+        margin-bottom: 13px;
+    }
+
+    .about-card p {
+        color: var(--muted);
+        font-size: 0.97rem;
+        line-height: 1.85;
+        margin: 0;
+    }
+
+    /* MISSION PANEL */
+    .about-mission {
+        position: relative;
+        margin-top: 65px;
+        padding: 48px;
+        overflow: hidden;
+        border-radius: 30px;
+        background: linear-gradient(
+            125deg,
+            #667eea 0%,
+            #705ec5 50%,
+            #764ba2 100%
+        );
+        color: white;
+        box-shadow: 0 18px 40px rgba(102,81,180,0.18);
+    }
+
+    .about-mission h3 {
+        font-size: clamp(1.7rem, 3vw, 2.35rem);
+        font-weight: 800;
+        margin-bottom: 17px;
+    }
+
+    .about-mission p {
+        color: rgba(255,255,255,0.9);
+        line-height: 1.9;
+        margin-bottom: 0;
+    }
+
+    .mission-icon {
+        width: 86px;
+        height: 86px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 26px;
+        background: rgba(255,255,255,0.16);
+        border: 1px solid rgba(255,255,255,0.25);
+        color: white;
+        font-size: 2.6rem;
+        margin: 0 auto;
+    }
+
+    /* CTA */
+    .about-cta {
+        text-align: center;
+        padding: 65px 20px 10px;
+    }
+
+    .about-cta h3 {
+        color: var(--dark);
+        font-weight: 800;
+        font-size: clamp(1.7rem, 3vw, 2.3rem);
+        margin-bottom: 15px;
+    }
+
+    .about-cta p {
+        color: var(--muted);
+        line-height: 1.8;
+        max-width: 650px;
+        margin: 0 auto 26px;
+    }
+
+    .about-cta .about-btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        box-shadow: 0 9px 23px rgba(102,81,180,0.22);
+    }
+
+    .about-cta .about-btn-primary:hover {
+        color: white;
+        box-shadow: 0 13px 28px rgba(102,81,180,0.3);
+    }
+
+    @media (max-width: 768px) {
+        .about-hero {
+            padding: 60px 20px 70px;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .about-hero p {
+            font-size: 1rem;
+        }
+
+        .about-intro {
+            padding-top: 50px;
+        }
+
+        .about-card {
+            padding: 25px;
+        }
+
+        .about-mission {
+            padding: 30px 23px;
+            text-align: center;
+        }
+
+        .mission-icon {
+            margin-top: 25px;
+        }
+    }
+</style>
+
+<div class="about-page">
+
+    <!-- HERO -->
+    <section class="about-hero">
+        <div class="container about-hero-content">
+
+            <div class="about-pill">
+                <i class="fas fa-sparkles me-2"></i>
+                YOUR SMARTER EVERYDAY COMPANION
+            </div>
+
+            <h1>
+                About Visual Risk<br>
+                and <span>AI Intelligence</span>
+            </h1>
+
+            <p>
+                Your Intelligent Life Simulation &amp; Decision Assistant.
+                Explore possibilities, understand your habits, and make
+                more informed everyday decisions through personal tracking,
+                scenario simulations, and AI-assisted guidance.
+            </p>
+
+            <div class="about-hero-actions">
+                <a href="{{ url_for('register') }}"
+                   class="about-btn-primary">
+                    <i class="fas fa-rocket me-2"></i>
+                    Get Started
+                </a>
+
+                <a href="#our-features"
+                   class="about-btn-outline">
+                    <i class="fas fa-arrow-down me-2"></i>
+                    Explore Features
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- INTRODUCTION -->
+    <section class="about-intro" id="our-features">
+        <div class="container">
+
+            <div class="about-eyebrow">WHAT WE OFFER</div>
+
+            <h2 class="about-heading">
+                Everything You Need to<br>
+                <span>Make Smarter Decisions</span>
+            </h2>
+
+            <p class="about-description">
+                Our platform brings multiple aspects of everyday life
+                into one convenient dashboard. Track your progress,
+                explore different scenarios, and find practical ways
+                to work toward your personal goals.
+            </p>
+
+            <div class="row g-4">
+
+                <!-- FINANCE -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="about-card">
+                        <div class="about-icon icon-purple">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+
+                        <h4>Financial Management</h4>
+
+                        <p>
+                            Track income, expenses, and savings.
+                            Review your financial habits and explore
+                            how different saving or spending choices
+                            could affect your finances.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- STUDY -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="about-card">
+                        <div class="about-icon icon-pink">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+
+                        <h4>Study Intelligence</h4>
+
+                        <p>
+                            Record study sessions, monitor learning
+                            consistency, and use your progress to
+                            support better academic planning and
+                            study routines.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FITNESS -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="about-card">
+                        <div class="about-icon icon-blue">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+
+                        <h4>Fitness Tracking</h4>
+
+                        <p>
+                            Record your physical activities, exercise
+                            duration, and calories burned to understand
+                            your activity patterns and work toward
+                            your fitness goals.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SIMULATION -->
+                <div class="col-md-6 col-lg-6">
+                    <div class="about-card">
+                        <div class="about-icon icon-green">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+
+                        <h4>Life Scenario Simulation</h4>
+
+                        <p>
+                            Explore hypothetical scenarios involving
+                            saving, spending, studying, or exercising.
+                            Review the estimated impact, risk, and
+                            recommendations to think through
+                            different choices.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- AI ASSISTANT -->
+                <div class="col-md-6 col-lg-6">
+                    <div class="about-card">
+                        <div class="about-icon icon-violet">
+                            <i class="fas fa-robot"></i>
+                        </div>
+
+                        <h4>AI-Powered Assistant</h4>
+
+                        <p>
+                            Ask questions and receive guidance through
+                            the configured AI integration or the
+                            application's rule-based response system.
+                            Use it to explore ideas and plan your next steps.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- MISSION -->
+            <div class="about-mission">
+                <div class="row align-items-center g-4">
+
+                    <div class="col-lg-8">
+                        <div class="about-eyebrow"
+                             style="color: #eee6ff; text-align: left;">
+                            OUR PURPOSE
+                        </div>
+
+                        <h3>
+                            Small Insights.<br>
+                            Smarter Everyday Choices.
+                        </h3>
+
+                        <p>
+                            We aim to make personal progress easier to
+                            understand by bringing tracking, simulations,
+                            and AI-assisted guidance together in one place.
+                            The goal is to help users reflect on their
+                            habits, consider alternatives, and plan
+                            their next steps with greater clarity.
+                        </p>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="mission-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- CALL TO ACTION -->
+            <div class="about-cta">
+                <h3>
+                    Ready to Take Control of Your Goals?
+                </h3>
+
+                <p>
+                    Start exploring your progress, understand your
+                    habits, and discover new possibilities with
+                    Visual Risk and AI Intelligence.
+                </p>
+
+                <a href="{{ url_for('register') }}"
+                   class="about-btn-primary">
+                    <i class="fas fa-rocket me-2"></i>
+                    Create Your Account
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}
